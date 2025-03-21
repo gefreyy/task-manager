@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de tareas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body id="general">
+    <div class="barra-lateral-izq">
+        <nav>
+            <div class="barra-lateral-top">
+                <div class="barra-lateral-elements">
+                    <div class="usuario">
+                        <h3>Gefrey</h3>
+                    </div>
+                    <div class="botones">
+                        <button class="menu-hamburguesa">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path fill="currentColor" fill-rule="evenodd" d="M19 4.001H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2Zm-15 2a1 1 0 0 1 1-1h4v14H5a1 1 0 0 1-1-1v-12Zm6 13h9a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-9v14Z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <button class="open-add-tarea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
+                </svg>
+                <h4>Añadir tarea</h4>
+            </button>
+            <button class="open-add-proyecto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
+                </svg>
+                <h4>Añadir Proyecto</h4>
+            </button>
+
+            <dialog class="modal-add-tasks">
+                <form id="add-task-form" action="index.html" method="get">
+                    <h1 class="yap-form">Crea una nueva tarea</h1>
+                    <fieldset class="desc-field">
+                        <legend>Descripción</legend>
+                        <textarea class="add-desc-task" type="text" placeholder="Descripción de la tarea..." maxlength="120"></textarea>
+                    </fieldset>
+                    
+                    <div class="config-box">
+                        <div class="fecha-limite-box">
+                            <span>Fecha limite:</span>
+                            <input type="date" name="add-limit-date" id="add-limit-date">
+                        </div>
+                        <div class="prioridad-box">
+                            <span>Prioridad:</span>
+                            <select name="add-prioridad" id="add-prioridad">
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="buttons-form">
+                        <input class="add-task btn" type="submit" value="Agregar tarea">
+                        <input class="close-add-task-form btn" type="submit" value="Cerrar">
+                    </div>                   
+                </form>
+            </dialog>
+
+            <dialog class="modal-edit-tasks">
+                <form id="edit-task-form" action="index.html" method="get">
+                    <h1 class="yap-form">Edita la tarea</h1>
+                    <fieldset class="desc-field">
+                        <legend>Descripción</legend>
+                        <textarea class="edit-desc-task" type="text" placeholder="Descripción de la tarea..." maxlength="120"></textarea>
+                    </fieldset>
+                    
+                    <div class="config-box">
+                        <div class="fecha-limite-box">
+                            <span>Fecha limite:</span>
+                            <input type="date" name="edit-limit-date" id="edit-limit-date">
+                        </div>
+                        <div class="prioridad-box">
+                            <span>Prioridad:</span>
+                            <select name="edit-prioridad" id="edit-prioridad">
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="buttons-form">
+                        <input class="edit-task btn" type="submit" value="Editar tarea">
+                        <input class="close-edit-task-form btn" type="button" value="Cerrar">
+                    </div>                   
+                </form>
+            </dialog>
+
+            <dialog class="modal-projects">
+                <form id="task-form" action="index.html" method="get">
+                    <h1 class="yap-form">Crea un nuevo proyecto</h1>
+                    <input class="name-project" type="text" placeholder="Nombre del proyecto..." maxlength="70"/>
+                    <div class="buttons-form">
+                        <input class="add-project btn" type="submit" value="Agregar proyecto">
+                        <input class="close-project-form btn" type="submit" value="Cerrar">
+                    </div>                   
+                </form>
+            </dialog>
+
+            <hr>
+            <div class="barra-lateral-body">
+                <h3>Mis Proyectos</h3>
+                <ul class="proyectos">
+                    <li class="proyecto"><a href="#">llavaescri</a></li>   
+                    <li class="proyecto"><a href="#">que</a></li>
+                    <li class="proyecto"><a href="#">que</a></li>   
+                </ul>
+            </div>
+        </nav>
+
+    </div>
+
+    <div class="cuerpo">
+        <div class="contenido">
+            <h1>Hoy</h1>
+            <hr>
+            <ul id="lista-tareas">
+                <!-- <div class="header-main">
+                    <div class="header-1">
+                        <h4 class="header-id">ID</h4>
+                        <h4 class="header-desc">Descripción</h4>
+                    </div>
+                    <div class="header-2">
+                        <h4 class="header-fecven">Fecha de Vencimiento</h4>
+                        <h4 class="header-op">Opciones</h4>
+                    </div>
+                </div> -->
+                
+                <!-- <li class="item-task" draggable="true">
+                    <div class="tarea-elemento">
+                        <p class="task-number">7.</p>
+                        <div class="tareas">
+                            <div class="checkbox">
+                                <input type="checkbox" id="demoCheckbox" name="checkbox" value="1">
+                            </div>
+                            <label for="demoCheckbox">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, eius maxime! Consectetur molestias explicabo maxime, tenetur enim necessitatibus ullam similique veniam error rerum. Tenetur, hic mollitia esse est eligendi illum?</label>
+                            <span class="prioridad">Alta</span>
+                            <span class="fecha">13-07-2025</span>
+                        </div>
+                        <div class="opciones-tarea">
+                            <button class="btn-edit"><img src="editar.png" alt="edit_icon" width="24"></button>
+                            <button class="btn-borrar"><img src="basura.png" alt="trash_icon" width="24"></button>                
+                        </div>
+                    </div>
+                </li> -->
+            </ul>
+        </div>    
+    </div>
+    <h3 class="no-tasks">No hay tareas!</h3>
+    <script src="./js/index.js"></script>
+</body>
+</html>

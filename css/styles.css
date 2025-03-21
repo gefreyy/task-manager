@@ -1,0 +1,379 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Outfit", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+body {
+    position: relative;
+    display: flex;
+    background-color: rgb(44, 44, 44);
+}
+
+.barra-lateral-izq {
+    height: 100vh;
+    width: 320px;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(61, 61, 61);
+    overflow-x: hidden;
+    color: white;
+}
+
+.usuario {
+    width: 100%;
+}
+
+h3 {
+    font-size: 1.3rem;
+}
+
+.barra-lateral-elements {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem;
+}
+
+.menu-hamburguesa {
+    display: flex;
+    background-color: rgb(61, 61, 61);
+    color: white;
+    border: none;
+}
+
+.menu-hamburguesa:hover {
+    cursor: pointer;
+    background-color: rgb(75, 75, 75);
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid rgb(83, 83, 83);
+    margin: 0.2em 0;
+    padding: 0;
+    width: 100%;
+}
+
+.open-add-tarea, .open-add-proyecto {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    background-color: rgb(61, 61, 61);
+    color: white;
+}
+
+.open-add-tarea:hover, .open-add-proyecto:hover {
+    background-color: rgb(75, 75, 75);
+    cursor: pointer;
+}
+
+.open-add-tarea h4, .open-add-proyecto h4 {
+    margin-left: 1rem;
+}
+
+.barra-lateral-body {
+    padding: 0.8rem;
+}
+
+.proyectos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style: circle;
+}
+
+li {
+    list-style: inside;
+    padding: 0.2rem;
+    width: 90%;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+.cuerpo {
+    position: relative;
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    z-index: 1;
+}
+
+.no-tasks {
+    opacity: 0;
+    position: absolute;
+    z-index: 0;
+}
+
+.no-tasks-enabled {
+    opacity: 1;
+    color: rgba(240, 240, 240, 0.678);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(50%, 0%);
+    z-index: 2;
+}
+
+.contenido {
+    width: 75%;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+.contenido hr {
+    border-top: 1px solid rgb(116, 116, 116);
+    margin-top: 1rem;
+}
+
+.cuerpo h1 {
+    font-weight: 800;
+    font-size: 50px;
+}
+
+.tarea-elemento {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+
+.tareas {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    min-width: 300px;
+}
+
+svg {
+    background: none !important;
+}
+
+/* .tareas:hover {
+    
+} */
+
+.tareas label {
+    margin-left: 1rem;
+    user-select: none;
+    padding: 0.5rem;
+    margin-left: 0;
+    width: 50%;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.opciones-tarea {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    width: fit-content;
+    gap: 10px;
+}
+
+span {
+    color: white;
+    font-weight: 600;
+}
+
+#limit-date {
+    width: 100%;
+    height: 30px;
+    outline: none;
+}
+
+.prioridad {
+    text-align: center;
+    flex: 1;
+}
+
+.fecha {
+    text-align: center;
+    flex: 1;
+}
+
+.btn-borrar, .btn-edit {
+    width: 1.5rem;
+    border: 0;
+    display: flex;
+    background: none;
+    filter: invert(100%);
+}
+
+.btn-borrar:hover, .btn-edit:hover {
+    background-color: rgb(150, 150, 150);
+    cursor: pointer;
+}
+
+
+.modal-add-tasks, .modal-edit-tasks, .modal-projects {
+    position: relative;
+    width: 50dvw;
+    height: 50vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #373737;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #696969;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#add-task-form, #edit-task-form {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.yap-form {
+    text-align: center;
+    font-size: clamp(1rem, 4.5vw, 2.5rem);
+    color: white;
+}
+
+.desc-field {
+    width: 90%;
+    color: white;
+    border: 1px solid #505050;
+}
+
+legend {
+    margin-left: 1rem;
+}
+
+.add-desc-task, .edit-desc-task {
+    width: 100%;
+    height: 100px;
+    resize: none;
+    background-color: #373737;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem;
+    color: white;
+}
+
+.add-desc-task:focus, .edit-desc-task:focus {
+    border: none;
+    outline: none;
+}
+
+.config-box {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+
+.fecha-limite-box, .prioridad-box {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+
+.name-project {
+    width: 80%;
+    height: 70px;
+    margin: 1rem 0;
+    background-color: #373737;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    padding: 1rem;
+    color: white;
+    font-weight: bold;
+}
+
+.desc-field:focus, .name-project:focus {
+    outline: none !important;
+    border:1px solid #505050;
+    box-shadow: 0 0 10px #000000;
+}
+
+.add-task, .edit-task, .close-add-task-form, .close-edit-task-form {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 15px;
+    padding: 1rem;
+}
+
+.add-task, .edit-task {
+    background: hsl(120, 100%, 83%);
+}
+
+.close-add-task-form, .close-edit-task-form {
+    background: hsl(0, 100%, 70%);
+}
+
+.btn:hover {
+    filter: brightness(70%);
+}
+
+.item-task {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.task-number {
+    width: 30px;
+}
+
+.header-main{
+    display: flex;
+    width: 100%;
+    min-width: 300px;
+    padding: 1rem;
+}
+
+.header-1, .header-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    text-align: center;
+}
+
+.header-desc {
+    flex: 1;
+}
+
+.header-fecven {
+    width: 100%;
+}
+
+.header-op{
+    flex: 1;
+}
