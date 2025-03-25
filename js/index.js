@@ -299,20 +299,29 @@ function mostrarTareas(tarea) { // Funcion para crear la estructura.
 
 }
 
-// Reordenar a gusto del cliente
-
+// Reordenar las tareas con drag and drop
 let tareas = document.querySelectorAll(".item-task");
-let draggedItem = null;
+let draggedItem = null; // Elemento arrastrado
+let idDraggedItem = null; // Id del elemento arrastrado
+let originalIndex = null; // Indice original del array
+let targetItem = null; // Elemento objetivo
 
 function addDragAndDropEvents(item) {
     item.addEventListener('dragstart', (event) => {
         draggedItem = event.target;
         event.target.classList.add("dragging");
+        idDraggedItem = event.target.getAttribute('data-id');
+        originalIndex = [...draggedItem.parentNode.children].indexOf(draggedItem); // Guardo el índice original
     });
 
     item.addEventListener('dragend', () => {
         if (draggedItem) {
             draggedItem.classList.remove("dragging");
+            // Verifico si la posición ha cambiado
+            const newIndex = [...draggedItem.parentNode.children].indexOf(draggedItem); // Nuevamente obtengo el índice
+            if (originalIndex !== newIndex) {
+                updateTaskListOrder(); // Añadido aquí
+            }
             draggedItem = null;
         }
     });
@@ -324,10 +333,12 @@ listaTareas.addEventListener('dragover', (event) => {
 
     const afterElement = getDragAfterElement(listaTareas, event.clientY);
 
-    if(afterElement == null) {
-        listaTareas.appendChild(draggedItem);
+    if (afterElement == null) {
+        listaTareas.appendChild(draggedItem);  // Se soltó al final de la lista
+        targetItem = null;  // No hay siguiente, por lo que no asignamos ningún target
     } else {
-        listaTareas.insertBefore(draggedItem, afterElement);
+        listaTareas.insertBefore(draggedItem, afterElement);  // Se soltó antes del siguiente
+        targetItem = afterElement.getAttribute('data-id');  // Guardamos el siguiente elemento como el target
     }
 });
 
@@ -344,6 +355,28 @@ function getDragAfterElement(container, y) {
         return closest;
       }
     }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function updateTaskListOrder() {
+    const taskElements = [...document.querySelectorAll('.item-task')]; // Todos los elementos de tareas en el DOM
+
+    // Creo un nuevo array basado en el orden que tiene el DOM
+    const newTareasLista = taskElements.map((element, index) => {
+        const id = parseInt(element.getAttribute('data-id'));
+        // Encontramos la tarea correspondiente en tareasLista y la agregamos con su nuevo orden
+        const originalTask = tareasLista.find(t => t.id === id);
+        return { ...originalTask, order: index }; // Agregamos un campo de orden
+    });
+
+    // Ordenamos el nuevo array por el campo order
+    newTareasLista.sort((a, b) => a.order - b.order);
+
+    // Limpiamos el array original y agregamos los nuevos elementos
+    tareasLista.length = 0;
+    tareasLista.push(...newTareasLista);
+
+    // Guardar los cambios en localStorage
+    localStorage.setItem('tareas', JSON.stringify(tareasLista));
 }
 
 let noTasks = document.querySelector('.no-tasks');
