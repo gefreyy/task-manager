@@ -15,7 +15,7 @@
             <div class="barra-lateral-top">
                 <div class="barra-lateral-elements">
                     <div class="usuario">
-                        <h3>Gefrey</h3>
+                        <h3>Hola!</h3>
                     </div>
                     <div class="botones">
                         <button class="menu-hamburguesa">
@@ -27,19 +27,20 @@
                 </div>
             </div>
             <hr>
-            <button class="open-add-tarea">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
-                </svg>
-                <h4>Añadir tarea</h4>
-            </button>
-            <button class="open-add-proyecto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
-                </svg>
-                <h4>Añadir Proyecto</h4>
-            </button>
-
+            <div class="buttons-task-project">
+                <button class="open-add-tarea">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
+                    </svg>
+                    <h4>Añadir tarea</h4>
+                </button>
+                <button class="open-add-proyecto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path fill="currentColor" fill-rule="evenodd" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm-.711-16.5a.75.75 0 1 1 1.5 0v4.789H17.5a.75.75 0 0 1 0 1.5h-4.711V17.5a.75.75 0 0 1-1.5 0V12.79H6.5a.75.75 0 1 1 0-1.5h4.789V6.5Z" clip-rule="evenodd"></path>
+                    </svg>
+                    <h4>Añadir Proyecto</h4>
+                </button>
+            </div>
             <dialog class="modal-add-tasks">
                 <form id="add-task-form" action="index.html" method="get">
                     <h1 class="yap-form">Crea una nueva tarea</h1>
@@ -101,13 +102,15 @@
             </dialog>
 
             <dialog class="modal-projects">
-                <form id="task-form" action="index.html" method="get">
+                <form id="project-form" action="index.html" method="get">
                     <h1 class="yap-form">Crea un nuevo proyecto</h1>
-                    <input class="name-project" type="text" placeholder="Nombre del proyecto..." maxlength="70"/>
-                    <div class="buttons-form">
-                        <input class="add-project btn" type="submit" value="Agregar proyecto">
-                        <input class="close-project-form btn" type="submit" value="Cerrar">
-                    </div>                   
+                    <div class="create-project-container">
+                        <input class="name-project" type="text" placeholder="Nombre del proyecto..." maxlength="30"/>
+                        <div class="buttons-form">
+                            <input class="add-project btn" type="submit" value="Agregar proyecto">
+                            <input class="close-project-form btn" type="submit" value="Cerrar">
+                        </div>          
+                    </div>
                 </form>
             </dialog>
 
@@ -115,18 +118,17 @@
             <div class="barra-lateral-body">
                 <h3>Mis Proyectos</h3>
                 <ul class="proyectos">
-                    <li class="proyecto"><a href="#">llavaescri</a></li>   
+                    <!-- <li class="proyecto"><a href="#">llavaescri</a></li>   
                     <li class="proyecto"><a href="#">que</a></li>
-                    <li class="proyecto"><a href="#">que</a></li>   
+                    <li class="proyecto"><a href="#">que</a></li>    -->
                 </ul>
             </div>
         </nav>
-
     </div>
 
     <div class="cuerpo">
         <div class="contenido">
-            <h1>Hoy</h1>
+            <h1 id="fecha"></h1>
             <hr>
             <ul id="lista-tareas">
                 <!-- <div class="header-main">
@@ -158,9 +160,14 @@
                     </div>
                 </li> -->
             </ul>
-        </div>    
+        </div>
+        <h3 class="no-tasks">No hay tareas!</h3>
     </div>
-    <h3 class="no-tasks">No hay tareas!</h3>
+    <button class="floating-menu-hamburguesa">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M19 4.001H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2Zm-15 2a1 1 0 0 1 1-1h4v14H5a1 1 0 0 1-1-1v-12Zm6 13h9a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-9v14Z" clip-rule="evenodd"></path>
+        </svg>
+    </button>
     <script src="./js/index.js"></script>
 </body>
 </html>
