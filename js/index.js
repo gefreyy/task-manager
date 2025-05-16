@@ -17,8 +17,8 @@ const closeEditTaskForm = document.querySelector('.close-edit-task-form');
 const openAddProyecto = document.querySelector('.open-add-proyecto');
 const closeProjectForm = document.querySelector('.close-project-form');
 const modalProjects = document.querySelector('.modal-projects');
-const addNewProject = document.querySelector('.add-project');
 const nameProject = document.querySelector('.name-project');
+const addNewProject = document.querySelector('.add-project');
 
 
 const tareaElemento = document.querySelector('.tarea-elemento');
@@ -26,47 +26,150 @@ const listaTareas = document.getElementById('lista-tareas');
 const borrarBtn = document.querySelector('.btn-borrar');
 const tareaCreada = document.querySelector('.item-task');
 
+const listaProyectos = document.querySelector('.proyectos');
 
+let noTasks = document.querySelector('.no-tasks');
 
 // Aqui estará la lista de proyectos y adentro de ella la lista de tareas.
 let proyectosLista = [];
 
-// Aqui guardare las tareas a manera de objetos.
-let tareasLista = [];
-
-
-// Contador que servirá como ID para las tareas
-let taskIdCounter = 1;
+// // Contador que servirá como ID para las tareas
+// let taskIdCounter = 1;
+// Expresión regular para validar que el campo no esté vacío
 const regex = /^\s*$/;
+// Variable para almacenar el ID de la tarea que se está editando
 let currentEditTaskId = null;
 
 let date = new Date()
+
+window.addEventListener('load', () => {
+    if (!location.hash) {
+        location.hash = '#/';
+    }
+});
+
+function addProject() {
+    let proyecto = nameProject.value;
+    let maxId = proyectosLista.length > 0 ? Math.max(...proyectosLista.map(p => p.idProyecto)) : 0
+
+    let nuevoProyecto = {
+        idProyecto: maxId+1,
+        nombre: proyecto,
+        tareas: []
+    }
+    proyectosLista.push(nuevoProyecto)
+    // console.log(`Proyecto creado con id: ${nuevoProyecto.idProyecto}`)
+    localStorage.setItem('proyectos', JSON.stringify(proyectosLista));
+    mostrarProyectos(nuevoProyecto)
+}
 
 function addTask() {
     let tarea = addDescTarea.value;
     let fechaLimite = addLimitDate.value; 
     let prioridad = addPriorityTask.value;
+
+    const nombreProyecto = location.hash.split("/")[2];
+    const proyecto = proyectosLista.find(p => p.nombre.toLowerCase().replace(/\s+/g, '-') === nombreProyecto.toLowerCase().replace(/\s+/g, '-'));
+
+    // console.log(nombreProyecto)
     
-    let maxId = tareasLista.length > 0 ? Math.max(...tareasLista.map(t => t.id)) : 0; // Busca el mayor 
+    if (proyecto) {
+        let maxId = proyecto.tareas.length > 0 ? Math.max(...proyecto.tareas.map(t => t.idTarea)) : 0;
 
-    let nuevaTarea = {
-        id: maxId+1,
-        desc: tarea,
-        priority: prioridad,
-        dateLimit: fechaLimite,
-        isChecked: false
-    };
+        let nuevaTarea = {
+            idTarea: maxId + 1,
+            desc: tarea,
+            priority: prioridad,
+            dateLimit: fechaLimite,
+            isChecked: false
+        };
 
-    tareasLista.push(nuevaTarea);
-    localStorage.setItem('tareas', JSON.stringify(tareasLista));
-    taskIdCounter++;
+        proyecto.tareas.push(nuevaTarea);
 
-    mostrarTareas(nuevaTarea);
-    console.log(fechaLimite)
+        localStorage.setItem('proyectos', JSON.stringify(proyectosLista));
+
+        mostrarTareas(nuevaTarea);
+
+        // console.log("Tarea añadida con éxito", nuevaTarea);
+    } else {
+        alert("Proyecto no encontrado");
+    }
+}
+
+function editTask() {
+    let fechaIntroducida = new Date(editLimitDate.value);
+    if (!regex.test(editDescTarea.value) && fechaIntroducida > date) {
+        const nombreProyecto = location.hash.split("/")[2];
+        const proyecto = proyectosLista.find(p => p.nombre.toLowerCase().replace(/\s+/g, '-') === nombreProyecto.toLowerCase().replace(/\s+/g, '-'));
+
+        if (proyecto) {
+            const tareaIndex = proyecto.tareas.findIndex(t => t.idTarea === currentEditTaskId);
+            
+            if (tareaIndex !== -1) {
+                proyecto.tareas[tareaIndex].desc = editDescTarea.value;
+                proyecto.tareas[tareaIndex].priority = editPriorityTask.value;
+                proyecto.tareas[tareaIndex].dateLimit = editLimitDate.value;
+
+                localStorage.setItem('proyectos', JSON.stringify(proyectosLista));
+
+                const taskItem = document.querySelector(`.item-task[data-id="${currentEditTaskId}"]`);
+                if (taskItem) {
+                    const label = taskItem.querySelector('label');
+                    const priority = taskItem.querySelector('.prioridad');
+                    const date = taskItem.querySelector('.fecha');
+                    
+                    label.textContent = editDescTarea.value;
+                    priority.textContent = editPriorityTask.value;
+                    let fechaSplit = editLimitDate.value.split('-');
+                    let fechaFormateada = `${fechaSplit[2]}/${fechaSplit[1]}/${fechaSplit[0]}`
+                    date.textContent = fechaFormateada;
+                }
+
+                modalEditTasks.close();
+                // console.log(`Tarea actualizada con ID: ${currentEditTaskId}`);
+            }
+        } else {
+            alert("Proyecto no encontrado");
+        }
+    } else {
+        alert("Por favor, no deje el campo vacío o introduzca una fecha válida.");
+    }
+}
+
+function deleteTask(taskId) {
+    const taskItem = document.querySelector(`.item-task[data-id="${taskId}"]`);
+    
+    if (taskItem) {
+        const nombreProyecto = location.hash.split("/")[2];
+        const proyecto = proyectosLista.find(p => p.nombre.toLowerCase().replace(/\s+/g, '-') === nombreProyecto.toLowerCase().replace(/\s+/g, '-'));
+
+        if (proyecto) {
+            const tareaIndex = proyecto.tareas.findIndex(t => t.idTarea === taskId);
+
+            if (tareaIndex !== -1) {
+                // console.log(`Se eliminará la tarea con ID: ${taskId}`);
+                
+                proyecto.tareas.splice(tareaIndex, 1);
+                
+                localStorage.setItem('proyectos', JSON.stringify(proyectosLista));
+
+                taskItem.remove();
+
+                if (proyecto.tareas.length === 0 && noTasks) {
+                    noTasks.classList.add('no-tasks-enabled');
+                }
+                
+                // console.log("Tarea eliminada con éxito");
+            }
+        } else {
+            alert("Proyecto no encontrado");
+        }
+    } else {
+        console.error(`No se encontró el elemento con ID: ${taskId}`);
+    }
 }
 
 // Delegación de eventos para eliminar una tarea
-
 listaTareas.addEventListener('click', (event) => {
     const deleteButton = event.target.closest('.btn-borrar'); // Selecciona la clase del boton
     const checkbox = event.target.closest('input[type="checkbox"]'); // Selecciona el ID del checkbox
@@ -76,64 +179,62 @@ listaTareas.addEventListener('click', (event) => {
         const taskItem = checkbox.closest('.item-task');
         const valueId = parseInt(taskItem.getAttribute('data-id'));
 
-        for(let i = 0; i<tareasLista.length; i++) {
-            if(tareasLista[i].id === valueId) {
-                if(checkbox.checked) {
-                    tareasLista[i].isChecked = true;
-                    localStorage.setItem('tareas', JSON.stringify(tareasLista));
-                    break;
-                } else {
-                    tareasLista[i].isChecked = false;
-                    localStorage.setItem('tareas', JSON.stringify(tareasLista));
-                }
-            }
+        const nombreProyecto = location.hash.split("/")[2];
+        const proyecto = proyectosLista.find(p => p.nombre.toLowerCase() === nombreProyecto.toLowerCase());
+        const tarea = proyecto.tareas.find(t => t.idTarea === valueId);
+
+
+        if(checkbox.checked) {
+            tarea.isChecked = true;
+            localStorage.setItem('proyectos', JSON.stringify(proyectosLista))
+            // console.log(`Estas marcando ${tarea}`)
+
+        } else {
+            tarea.isChecked = false
+            localStorage.setItem('proyectos', JSON.stringify(proyectosLista))
+            // console.log(`Estas desmarcando ${tarea}`)
         }
     }
 
     if(editButton) {
-        event.preventDefault();
-        // If we found a delete button, find its parent task and remove it
+        // Encuentra el item-task que contiene al botón de editar
         const taskItem = editButton.closest('.item-task');
+        // if (!taskItem) return;
+        
         const valueId = parseInt(taskItem.getAttribute('data-id'));
-
-        for(let i = 0; i<tareasLista.length; i++) {
-            if(tareasLista[i].id === valueId) {
-                // Guardo el id de la tarea ACTUAL :)
-                currentEditTaskId = valueId;
-
+        currentEditTaskId = valueId; // Guarda el ID de la tarea actual
+        
+        const nombreProyecto = location.hash.split("/")[2];
+        const proyecto = proyectosLista.find(p => p.nombre.toLowerCase() === nombreProyecto.toLowerCase());
+        
+        if (proyecto) {
+            const tarea = proyecto.tareas.find(t => t.idTarea === valueId);
+            
+            if (tarea) {
                 modalEditTasks.showModal();
-                editDescTarea.value = tareasLista[i].desc;
-                editPriorityTask.value = tareasLista[i].priority;
-                editLimitDate.value = tareasLista[i].dateLimit;
-                console.log(`editando tarea con el id: ${tareasLista[i].id}`)
-                break;
+                editDescTarea.value = tarea.desc;
+                editPriorityTask.value = tarea.priority;
+                editLimitDate.value = tarea.dateLimit;
             }
         }
     }
     
     if (deleteButton) {
-        // If we found a delete button, find its parent task and remove it
         const taskItem = deleteButton.closest('.item-task');
-        const valueId = parseInt(taskItem.getAttribute('data-id'));
-
-        for(let i = 0; i<tareasLista.length; i++) {
-            if(tareasLista[i].id === valueId) {
-                console.log('Tarea eliminada', tareasLista[i]);
-                taskItem.remove();
-                tareasLista.splice(i, 1);
-                localStorage.setItem('tareas', JSON.stringify(tareasLista));
-                if(tareasLista == 0) {
-                    noTasks.classList.add('no-tasks-enabled');
-                }
-                break;
-            }
-        }
+        const taskId = parseInt(taskItem.getAttribute('data-id'));
+        deleteTask(taskId);
     }
 });
 
 openAddTarea.addEventListener('click', (e)=>{
     e.preventDefault();
-    modalAddTasks.showModal();
+    const nombreProyecto = location.hash.split("/")[2];
+
+    if(nombreProyecto !== undefined) {
+        modalAddTasks.showModal();
+    } else {
+        alert("You are NOT in a current project. Please create a project first.");
+    }
 })
 
 closeAddTaskForm.addEventListener('click', (e)=>{
@@ -157,146 +258,186 @@ closeProjectForm.addEventListener('click', (e)=>{
     nameProject.value = "";
 })
 
+addNewProject.addEventListener('click', (e) => {
+    e.preventDefault();
+    if(!regex.test(nameProject.value)){
+        addProject();
+        nameProject.value = "";
+        modalProjects.close();
+    } else {
+        alert("Introduzca un nombre válido");
+    }
+});
+
 addNewTask.addEventListener('click', (e) => {
     e.preventDefault();
-    let fechaIntroducida = new Date(addLimitDate.value)
-    if(!regex.test(addDescTarea.value) && fechaIntroducida > date) {
-        addTask();
-        addDescTarea.value = "";
-        addLimitDate.value = "";
-        modalAddTasks.close();
-        noTasks.classList.remove('no-tasks-enabled');
-    } else {
-        alert("Por favor, no deje el campo vacío o introduzca una fecha válida.");
-        console.log(Date(addLimitDate.value));
-    }
+    let fechaIntroducida = new Date(addLimitDate.value);
+        if(!regex.test(addDescTarea.value) && fechaIntroducida > date) {
+            addTask();
+            addDescTarea.value = "";
+            addLimitDate.value = "";
+            modalAddTasks.close();
+            noTasks.classList.remove('no-tasks-enabled');
+        } else {
+            alert("Por favor, no deje el campo vacío o introduzca una fecha válida.");
+            // console.log((addLimitDate.value).split("-"));
+        }
 });
 
 editCreatedTask.addEventListener('click', (e) => {
     e.preventDefault();
-    let fechaIntroducida = new Date(editLimitDate.value)
-    if(!regex.test(editLimitDate.value) && fechaIntroducida > date) {
-        // Busca y actualiza la tarea EN EL ARRAY "tareasLista"
-        for(let i = 0; i<tareasLista.length; i++) {
-            if(tareasLista[i].id === currentEditTaskId) {
-                tareasLista[i].desc = editDescTarea.value;
-                tareasLista[i].priority = editPriorityTask.value;
-                tareasLista[i].dateLimit = editLimitDate.value;
-
-                localStorage.setItem('tareas', JSON.stringify(tareasLista));
-
-                // Actualizo la VISTA usando data-id y el CURRENT ID que definí.
-                const taskItem = document.querySelector(`.item-task[data-id="${currentEditTaskId}"]`);
-                if(taskItem) {
-                    const label = taskItem.querySelector('label');
-                    const priority = taskItem.querySelector('.prioridad');
-                    const date = taskItem.querySelector('.fecha');
-                    
-                    label.textContent = tareasLista[i].desc;
-                    priority.textContent = tareasLista[i].priority;
-                    date.textContent = tareasLista[i].dateLimit;
-                }
-
-                modalEditTasks.close();
-                break;
-            }
-        }
-    } else {
-        alert("Por favor, no deje el campo vacío o introduzca una fecha válida.");
-    }
+    editTask();
 })
 
-window.onload = function(){ // en caso se encuentren tareas almacenadas, uso la funcion mostrarTareas para que se cree cada componente.
-    let tareasGuardadas = localStorage.getItem('tareas');
-    if(tareasGuardadas) {
-        tareasLista = JSON.parse(tareasGuardadas);
-        tareasLista.forEach(tarea => { // Por cada tarea, ejecuta la funcion mostrarTareas recibiendo las tareas almacenadas.
-            mostrarTareas(tarea);
-        });
-    } else {
-        tareasLista = []
-    }
+function obtenerProyectoDesdeUrl() {
+    const nombreProyecto = location.hash.split("/")[2];
+    // console.log(nombreProyecto)
 
-    if(tareasLista == 0) {
-        noTasks.classList.add('no-tasks-enabled');
-        console.log('works')
+    if (nombreProyecto) {
+        const proyecto = proyectosLista.find(p => p.nombre.toLowerCase().replace(/\s+/g, '-') === nombreProyecto.toLowerCase().replace(/\s+/g, '-'));
+        return proyecto || null;
+    } 
+    return null;
+}
+
+window.onload = function() {
+    let proyectosGuardados = localStorage.getItem('proyectos');
+    if (proyectosGuardados) {
+        proyectosLista = JSON.parse(proyectosGuardados);
+        proyectosLista.forEach(proyecto => {
+            mostrarProyectos(proyecto);
+        });
+
+        const proyectoActual = obtenerProyectoDesdeUrl();
+        if (proyectoActual) {
+            currentProjectId = proyectoActual.idProyecto;
+            mostrarTareas();
+        }
+    } else {
+        proyectosLista = [];
     }
-    
-    document.querySelectorAll(".item-task").forEach(addDragAndDropEvents);
-    console.log(tareasGuardadas);
 };
 
-function mostrarTareas(tarea) { // Funcion para crear la estructura.
+
+function mostrarProyectos(proyecto) {
     const li = document.createElement('li');
-    li.setAttribute('class', "item-task");
-    li.setAttribute('draggable', "true");
-    li.setAttribute('data-id', tarea.id);
+    li.setAttribute('class', 'proyecto');
+    li.setAttribute('data-id', proyecto.idProyecto);
 
-    const tareaElemento = document.createElement('div');
-    tareaElemento.setAttribute('class', "tarea-elemento");
+    // let originalName = proyecto.nombre;
 
-    const tareaNum = document.createElement('p');
-    tareaNum.setAttribute('class', "task-number");
+    let a = document.createElement('a');
+    a.textContent = proyecto.nombre;
+    let nameModified = proyecto.nombre.replace(/\s+/g, '-');
+    a.href = `#/project/${nameModified}`;
 
-    const tareas = document.createElement('div');
-    tareas.setAttribute('class', "tareas")
+    a.addEventListener('click', (e) => {
+        e.preventDefault()
+        // console.log(`accediendo a: ${nameModified} con ID ${proyecto.idProyecto}`)
+        // console.log(window.location)
+        cambiarUrl(`#/project/${nameModified}`)
+        mostrarTareas();
+    });
+    
+    listaProyectos.appendChild(li);
+    li.appendChild(a);
+}
 
-    const checkbox = document.createElement('div');
-    checkbox.setAttribute('class', "checkbox");
+// Función para cambiar la URL sin recargar la página
+function cambiarUrl(url) {
+    history.pushState(null, '', url);  // Esto cambia la URL en la barra de direcciones
+}
 
-    const inputCheckbox = document.createElement('input');
-    inputCheckbox.setAttribute('id', tarea.id);
-    inputCheckbox.setAttribute('type', "checkbox");
-    inputCheckbox.checked = tarea.isChecked;
+function mostrarTareas() {
+    const proyecto = obtenerProyectoDesdeUrl();
+    // console.log(proyecto)
 
-    const labelCheckbox = document.createElement('label');
-    labelCheckbox.setAttribute('for', tarea.id);
+    if (proyecto) {
+        const tareasDelProyecto = proyecto.tareas;
 
-    const prioridad = document.createElement('span');
-    prioridad.setAttribute('class', "prioridad");
-    prioridad.textContent = tarea.priority;
+        listaTareas.innerHTML = "";
 
-    const fecha = document.createElement('span');
-    fecha.setAttribute('class', "fecha");
-    fecha.textContent = tarea.dateLimit;
+        if (tareasDelProyecto.length === 0) {
+            // console.log("Este proyecto no tiene tareas.");
+            noTasks.classList.add('no-tasks-enabled')
+            return;
+        }
+        noTasks.classList.remove('no-tasks-enabled')
+        tareasDelProyecto.forEach(tarea => {
+            // Crear la estructura de cada tarea
+            const li = document.createElement('li');
+            li.setAttribute('class', "item-task");
+            li.setAttribute('draggable', "true");
+            li.setAttribute('data-id', tarea.idTarea);
 
-    const opcionesTarea = document.createElement('div');
-    opcionesTarea.setAttribute('class', "opciones-tarea");
+            const tareaElemento = document.createElement('div');
+            tareaElemento.setAttribute('class', "tarea-elemento");
 
-    const editBtn = document.createElement('button');
-    editBtn.setAttribute('class', 'btn-edit')
+            const tareaNum = document.createElement('p');
+            tareaNum.setAttribute('class', "task-number");
+            tareaNum.textContent = `${tarea.idTarea}.`;
 
-    const borrarBtn = document.createElement('button');
-    borrarBtn.setAttribute('class', `btn-borrar`);
+            const tareas = document.createElement('div');
+            tareas.setAttribute('class', "tareas");
 
-    const imgTrash = document.createElement('img');
-    imgTrash.setAttribute('src', '../img/basura.png');
-    imgTrash.setAttribute('width', '20');
+            const checkbox = document.createElement('div');
+            checkbox.setAttribute('class', "checkbox");
 
-    const imgEdit = document.createElement('img');
-    imgEdit.setAttribute('src', '../img/editar.png');
-    imgEdit.setAttribute('width', '20');
+            const inputCheckbox = document.createElement('input');
+            inputCheckbox.setAttribute('id', tarea.idTarea);
+            inputCheckbox.setAttribute('type', "checkbox");
+            inputCheckbox.checked = tarea.isChecked;
 
-    labelCheckbox.textContent = tarea.desc;
-    tareaNum.textContent = `${tarea.id}.`;
+            const labelCheckbox = document.createElement('label');
+            labelCheckbox.setAttribute('for', tarea.idTarea);
+            labelCheckbox.textContent = tarea.desc;
 
-    listaTareas.appendChild(li);
-    li.appendChild(tareaElemento);
-    // tareaElemento.appendChild(tareaNum);
-    tareaElemento.appendChild(tareas);
-    tareas.appendChild(checkbox);
-    checkbox.appendChild(inputCheckbox);
-    tareas.appendChild(labelCheckbox);
-    tareas.appendChild(prioridad);
-    tareas.appendChild(fecha);
-    tareaElemento.appendChild(opcionesTarea);
-    opcionesTarea.appendChild(editBtn);
-    opcionesTarea.appendChild(borrarBtn);
-    editBtn.append(imgEdit);
-    borrarBtn.appendChild(imgTrash);
+            const prioridad = document.createElement('span');
+            prioridad.setAttribute('class', "prioridad");
+            prioridad.textContent = tarea.priority;
 
-    addDragAndDropEvents(li);
+            const fecha = document.createElement('span');
+            fecha.setAttribute('class', "fecha");
+            let fechaSplit = tarea.dateLimit.split("-");
+            let fechaFormateada = `${fechaSplit[2]}/${fechaSplit[1]}/${fechaSplit[0]}`
+            fecha.textContent = fechaFormateada;
 
+            const opcionesTarea = document.createElement('div');
+            opcionesTarea.setAttribute('class', "opciones-tarea");
+
+            const editBtn = document.createElement('button');
+            editBtn.setAttribute('class', 'btn-edit');
+
+            const borrarBtn = document.createElement('button');
+            borrarBtn.setAttribute('class', `btn-borrar`);
+
+            const imgTrash = document.createElement('img');
+            imgTrash.setAttribute('src', '../img/basura.png');
+            imgTrash.setAttribute('width', '20');
+
+            const imgEdit = document.createElement('img');
+            imgEdit.setAttribute('src', '../img/editar.png');
+            imgEdit.setAttribute('width', '20');
+
+            listaTareas.appendChild(li);
+            li.appendChild(tareaElemento);
+            tareaElemento.appendChild(tareas);
+            tareas.appendChild(checkbox);
+            checkbox.appendChild(inputCheckbox);
+            tareas.appendChild(labelCheckbox);
+            tareas.appendChild(prioridad);
+            tareas.appendChild(fecha);
+            tareaElemento.appendChild(opcionesTarea);
+            opcionesTarea.appendChild(editBtn);
+            opcionesTarea.appendChild(borrarBtn);
+            editBtn.append(imgEdit);
+            borrarBtn.appendChild(imgTrash);
+
+            addDragAndDropEvents(li);
+        });
+    } else {
+        console.log("No se encontró el proyecto en la URL.");
+    }
 }
 
 // Reordenar las tareas con drag and drop
@@ -359,24 +500,45 @@ function getDragAfterElement(container, y) {
 
 function updateTaskListOrder() {
     const taskElements = [...document.querySelectorAll('.item-task')]; // Todos los elementos de tareas en el DOM
+    const proyectoPath = window.location.hash.split("/")[2];
+    const proyecto = proyectosLista.find(p => p.nombre.toLowerCase().replace(/\s+/g, '-') === proyectoPath.toLowerCase().replace(/\s+/g, '-'));
 
     // Creo un nuevo array basado en el orden que tiene el DOM
     const newTareasLista = taskElements.map((element, index) => {
         const id = parseInt(element.getAttribute('data-id'));
         // Encontramos la tarea correspondiente en tareasLista y la agregamos con su nuevo orden
-        const originalTask = tareasLista.find(t => t.id === id);
+        const originalTask = proyecto.tareas.find(t => t.idTarea === id);
+        // console.log(originalTask)
         return { ...originalTask, order: index }; // Agregamos un campo de orden
     });
 
     // Ordenamos el nuevo array por el campo order
     newTareasLista.sort((a, b) => a.order - b.order);
 
+    // console.log(newTareasLista)
+
     // Limpiamos el array original y agregamos los nuevos elementos
-    tareasLista.length = 0;
-    tareasLista.push(...newTareasLista);
+    proyecto.tareas.length = 0;
+    proyecto.tareas.push(...newTareasLista);
 
     // Guardar los cambios en localStorage
-    localStorage.setItem('tareas', JSON.stringify(tareasLista));
+    localStorage.setItem('proyectos', JSON.stringify(proyectosLista));
 }
 
-let noTasks = document.querySelector('.no-tasks');
+// Visual stuff
+const barraIzq = document.querySelector('.barra-lateral-izq');
+const menuHamburguesa = document.querySelector('.menu-hamburguesa');
+const floatingMenuHamburguesa = document.querySelector('.floating-menu-hamburguesa');
+const fecha = document.getElementById('fecha');
+
+menuHamburguesa.addEventListener('click', () => {
+    barraIzq.style.width = 0;
+    floatingMenuHamburguesa.classList.add('enabled');
+});
+
+floatingMenuHamburguesa.addEventListener('click', () => {
+    barraIzq.classList.add('active');
+    barraIzq.style.width = '300px';
+})
+
+fecha.textContent = 'Fecha: ' + date.getDate() + '/' + date.getDay() + '/' + date.getFullYear();
